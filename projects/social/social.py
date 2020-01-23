@@ -52,11 +52,14 @@ class SocialGraph:
         """
         if user_id == friend_id:
             print("WARNING: You cannot be friends with yourself")
+            return False
         elif friend_id in self.friendships[user_id] or user_id in self.friendships[friend_id]:
             print("WARNING: Friendship already exists")
+            return False
         else:
             self.friendships[user_id].add(friend_id)
             self.friendships[friend_id].add(user_id)
+            return True
 
     def add_user(self, name):
         """
@@ -69,6 +72,7 @@ class SocialGraph:
         # friendships also a dict {nums inside here 3, 4, 6,}
         # mapping the ID to the friendship
 
+
     def populate_graph(self, num_users, avg_friendships):
         """
         Takes a number of users and an average number of friendships
@@ -79,17 +83,37 @@ class SocialGraph:
 
         The number of users must be greater than the average number of friendships.
         """
+        ## graph = social network
+        ## node = users/people
+        ## edge = friendships
+        ## connected components = user's extended social network
+        ## BFS == (queue) find the shortest path hint in directions someone in extended network
+
         # Reset graph
         self.last_id = 0
         # last_id is the num on the outside (1, 2, 3, 4, 5, etc)
         self.users = {}
         self.friendships = {}
         # !!!! IMPLEMENT ME
-        for i in range(0, num_users):  # loop thru users
-            self.add_user(i)  # add each user
+        for i in range(num_users):  # loop thru users
+            self.add_user(f"User {i + 1}")  # add each user
         # Add users
         possible_friendships = []
+
         # Create friendships
+
+        ## NOTE: FROM CLASS below
+        # target_friendships = (num_users * avg_friendships)
+        # total_friendships = 0
+        # collisions = 0
+        # while total_friendships < target_friendships:
+        #     #create a random friendship
+        #     user_id = random.randint(1, self.last_id)
+        #     friend_id = random.randint()
+
+
+
+
         for userID in self.users:
             # add 1 to look next to it
             for friendID in range(userID + 1, self.last_id + 1):
@@ -119,6 +143,38 @@ class SocialGraph:
         # 1:[1] currently in visited
         # 3:[1, 3] will be in visited too if you pass in 3
         # !!!! IMPLEMENT ME
+        ## NOTE: every means TRAVERSAL 
+        # 1. create queue
+        # 2. enqueue enque starting point in a list to start the path
+        # 3. while queue not empty.. Dequeue the path, then find the last vertex
+        # in path, and then DO THE THING but only if we haven't visited this
+        # vertex before. THEN add to visited, then make new paths(copy) and enqueue
+        # for each vertex. 
+        ## NOTE: FROM CLASS below
+        #create queue
+        queue = Queue()
+        queue.enqueue([user_id]) # equeue starting point in list to start path
+        # while queue not empty
+        while queue.size() > 0:
+            #dequeue the path
+            path = queue.dequeue()
+            #find the last vertex in the path
+            current_friend = path[-1]
+            # if we havent visited that vertex
+            if current_friend not in visited:
+                # do the thing, add to visited dictionary path value
+                visited[current_friend] = path
+                #make new path(copy) and enqueue for
+                for friend_id in self.friendships[current_friend]:
+                    # ^ this is adjacency list
+                    new_path = list(path)
+                    new_path.append(friend_id)
+                    queue.enque(new_path)
+
+        return visited
+
+                
+## NOTE: below is from my own code
         q = Queue()
         # import queue above
         q.enqueue([user_id]) # pass in as a list 
